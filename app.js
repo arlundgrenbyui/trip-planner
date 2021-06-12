@@ -16,7 +16,7 @@ const User = require('./models/user')
 const app = express();
 
 const corsOptions = {
-  origin: "https://kmpcs.herokuapp.com/",
+  origin: "https://kmal-trip-planner.herokuapp.com/",
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
@@ -52,7 +52,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req,res,next) => {
   if (req.header('x-forwarded-proto') == 'http') {
-    res.redirect(301, 'https://' + 'kmpcs.herokuapp.com' + req.url)
+    res.redirect(301, 'https://' + 'kmal-trip-planner.herokuapp.com/' + req.url)
     return
   }
   next()
