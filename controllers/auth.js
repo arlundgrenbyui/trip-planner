@@ -157,7 +157,7 @@ exports.postSignup = (req, res, next) => {
     res.redirect('/login');
       return transporter.sendMail({
         to: email,
-        from: 'Kyle Mueller Custom PCs <kyle.mueller.custom.pcs@gmail.com>',
+        from: 'Kyle Mueller<kyle.mueller.ghs@gmail.com>',
         subject: 'Account Created Successfully!',
         html: `<h1>Hello ${name}!</h1>\n<h1>Congrats on your new account!</h1>`
       });
@@ -253,12 +253,12 @@ exports.postReset = (req, res, next) => {
         res.redirect('/');
         transporter.sendMail({
           to: req.body.email,
-          from: 'Kyle Mueller Custom PCs <kyle.mueller.custom.pcs@gmail.com>',
+          from: 'Kyle Mueller<kyle.mueller.ghs@gmail.com>',
           subject: 'Password reset',
           html: `
             <h1>Hello ${name},</h1>
             <p>You requested a password reset</p>
-            <p>Click this <a href="https://kmpcs.herokuapp.com/reset/${token}">link</a> to set a new password.</p>
+            <p>Click this <a href="https://kmal-trip-planner.herokuapp.com/reset/${token}">link</a> to set a new password.</p>
           `
         });
       })

@@ -52,7 +52,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req,res,next) => {
   if (req.header('x-forwarded-proto') == 'http') {
-    res.redirect(301, 'https://' + 'kmal-trip-planner.herokuapp.com/' + req.url)
+    res.redirect(301, 'https://' + 'kmal-trip-planner.herokuapp.com' + req.url)
     return
   }
   next()
