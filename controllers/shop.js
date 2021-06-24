@@ -4,7 +4,7 @@ const Order = require('../models/order');
 exports.getMap = (req, res, next) => {
   console.log('Does this even work');
   return res.render('shop/map', {
-    api_key: "AIzaSyBph4D_kwEpQlSQFK5lJ9n8bh8dd7u0Khk",
+    api_key: process.env.GOOGLE_MAPS_API_KEY,
     pageTitle: 'Map Page',
     path: '/map'
   });
