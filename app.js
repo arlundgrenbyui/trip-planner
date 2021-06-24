@@ -9,6 +9,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const {Client} = require("@googlemaps/google-maps-services-js");
 
 const errorController = require('./controllers/error');
 const User = require('./models/user')
@@ -91,19 +92,37 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.get('/500', errorController.get500);
+// app.get('/500', errorController.get500);
 
-app.use(errorController.get404);
+// app.use(errorController.get404);
 
-app.use((error, req, res, next) => {
-  // res.status(error.httpStatusCode).render(...);
-  // res.redirect('/500');
-  res.status(500).render('500', {
-    pageTitle: 'Error!',
-    path: '/500',
-    isAuthenticated: req.session.isLoggedIn
+// app.use((error, req, res, next) => {
+//   // res.status(error.httpStatusCode).render(...);
+//   // res.redirect('/500');
+//   res.status(500).render('500', {
+//     pageTitle: 'Error!',
+//     path: '/500',
+//     isAuthenticated: req.session.isLoggedIn
+//   });
+// });
+
+const client = new Client({});
+
+client
+  .directions({
+    params: {
+      origin: { lat: 45, lng: -110 },
+      destination: { lat: -110, lng: 45 },
+      key: process.env.GOOGLE_MAPS_API_KEY,
+    },
+    timeout: 1000, // milliseconds
+  })
+  .then((r) => {
+    console.log(r.data);
+  })
+  .catch((e) => {
+    console.log(e.response.data.error_message);
   });
-});
 
 mongoose
   .connect(

@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
 
 :root {
-  --background-clr: hsl(220, 13%, 18%);
-  --dark-clr: hsl(225, 13%, 12%);
+  --background-clr: #35363a;
+  --dark-clr: #212226;
   --white-text: #f2f2f2;
   --light-text: #adb4c0;
-  --salmon-clr: #d76460;
+  --salmon-clr: #47a356;
   --link-clr: #809fff;
   --grey-clr: #5d5f66;
 }
@@ -147,6 +147,11 @@ hr {
 .constrained {
   height: auto;
   max-width: 100%;
+}
+
+.banner {
+  height: auto;
+  width: 100%;
 }
 
 .product-img {
