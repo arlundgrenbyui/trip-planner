@@ -1,27 +1,33 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/product.css">
-    <script
-        src="http://maps.googleapis.com/maps/api/js?key=<%= api_key %>">
-    </script>
-
-    <script>
-        function initialize() {
-            var mapProp = {
-                center:new google.maps.LatLng(51.508742,-0.120850),
-                zoom:5,
-                mapTypeId:google.maps.MapTypeId.ROADMAP
-            };
-            var map=new google.maps.Map(document.getElementById("googleMap"), mapProp);
-        }
-        google.maps.event.addDomListener(window, 'load', initialize);
-    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 </head>
 
 <body>
     <%- include('../includes/header.ejs') %>
 
     <main>
-        <div id="googleMap" style="width:500px;height:380px;"></div>
+        <div style="display: none">
+            <input
+                id="origin-input"
+                class="controls"
+                type="text"
+                placeholder="Enter an origin location"
+            />
+        
+            <input
+                id="destination-input"
+                class="controls"
+                type="text"
+                placeholder="Enter a destination location"
+            />
+        </div>
+
+        <div id="map"></div>
+        <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key=<%= api_key %>&callback=initMap&libraries=places&v=weekly"
+            async
+        ></script>
     </main>
 
 
