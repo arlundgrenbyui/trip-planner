@@ -1,11 +1,23 @@
 const { validationResult } = require('express-validator/check');
 
 const Product = require('../models/product');
+const Trip = require('../models/trip');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
+    editing: false,
+    hasError: false,
+    errorMessage: null,
+    validationErrors: []
+  });
+};
+
+exports.getAddTrip = (req, res, next) => {
+  res.render('admin/edit-trip', {
+    pageTitle: 'Add Trip',
+    path: '/admin/add-trip',
     editing: false,
     hasError: false,
     errorMessage: null,
@@ -59,6 +71,64 @@ exports.postAddProduct = (req, res, next) => {
     });
 };
 
+
+exports.postAddTrip = (req, res, next) => {
+  const name = req.body.name;
+  // const imageUrl = req.body.imageUrl;
+  const location = req.body.location;
+  const description = req.body.description;
+  const plannedDate = req.body.plannedDate;
+  const weather = req.body.weather;
+  const directions = req.body.directions;
+  const recommendations = req.body.recommendations;
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Trip',
+      path: '/admin/edit-trip',
+      editing: false,
+      hasError: true,
+      trip: {
+        name: name,
+        location: location,
+        description: description,
+        plannedDate: plannedDate,
+        weather: weather,
+        directions: directions,
+        recommendations: recommendations,
+      },
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array()
+    });
+  }
+
+  const trip = new Trip({
+    name: name,
+    location: location,
+    description: description,
+    plannedDate: plannedDate,
+    weather: weather,
+    directions: directions,
+    recommendations: recommendations,
+    userId: req.user
+  });
+
+  trip
+    .save()
+    .then(result => {
+      // console.log(result);
+      console.log('Created Trip');
+      res.redirect('/admin/trips');
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
 exports.getEditProduct = (req, res, next) => {
   const editMode = req.query.edit;
   if (!editMode) {
@@ -86,6 +156,36 @@ exports.getEditProduct = (req, res, next) => {
       return next(error);
     });
 };
+
+
+exports.getEditTrip = (req, res, next) => {
+  const editMode = req.query.edit;
+  if (!editMode) {
+    return res.redirect('/');
+  }
+  const tripId = req.params.tripId;
+  Trip.findById(tripId)
+    .then(trip => {
+      if (!trip) {
+        return res.redirect('/');
+      }
+      res.render('admin/edit-trip', {
+        pageTitle: 'Edit Trip',
+        path: '/admin/edit-trip',
+        editing: editMode,
+        trip: trip,
+        hasError: false,
+        errorMessage: null,
+        validationErrors: []
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
 
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
@@ -135,6 +235,66 @@ exports.postEditProduct = (req, res, next) => {
     });
 };
 
+
+exports.postEditTrip = (req, res, next) => {
+  const tripId = req.body.tripId;
+  const name = req.body.name;
+  // const imageUrl = req.body.imageUrl;
+  const location = req.body.location;
+  const description = req.body.description;
+  const plannedDate = req.body.plannedDate;
+  const weather = req.body.weather;
+  const directions = req.body.directions;
+  const recommendations = req.body.recommendations;
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(422).render('admin/edit-trip', {
+      pageTitle: 'Edit Trip',
+      path: '/admin/edit-trip',
+      editing: true,
+      hasError: true,
+      trip: {
+        name: name,
+        location: location,
+        description: description,
+        plannedDate: plannedDate,
+        weather: weather,
+        directions: directions,
+        recommendations: recommendations,
+        _id: tripId
+      },
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array()
+    });
+  }
+
+  Trip.findById(tripId)
+    .then(trip => {
+      if (trip.userId.toString() !== req.user._id.toString()) {
+        return res.redirect('/');
+      }
+      trip.name = name;
+      trip.location = location;
+      trip.description = description;
+      trip.plannedDate = plannedDate;
+      trip.weather = weather;
+      trip.directions = directions;
+      trip.recommendations = recommendations;
+      return trip.save().then(result => {
+        console.log('UPDATED TRIP!');
+        res.redirect('/admin/trips');
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
+
 exports.getProducts = (req, res, next) => {
   Product.find({ userId: req.user._id })
     .then(products => {
@@ -152,12 +312,43 @@ exports.getProducts = (req, res, next) => {
     });
 };
 
+exports.getTrips = (req, res, next) => {
+  Trip.find({ userId: req.user._id })
+    .then(trips => {
+      // console.log(products);
+      res.render('admin/trips', {
+        trips: trips,
+        pageTitle: 'Admin Trips',
+        path: '/admin/trips'
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then(() => {
       console.log('DESTROYED PRODUCT');
       res.redirect('/admin/products');
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
+exports.postDeleteTrip = (req, res, next) => {
+  const tripId = req.body.tripId;
+  Trip.deleteOne({ _id: tripId, userId: req.user._id })
+    .then(() => {
+      console.log('DESTROYED TRIP');
+      res.redirect('/admin/trips');
     })
     .catch(err => {
       const error = new Error(err);

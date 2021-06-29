@@ -18,17 +18,12 @@ const userSchema = new Schema({
   },
   resetToken: String,
   resetTokenExpiration: Date,
-  cart: {
-    items: [
+  trips: {
+    places: [
       {
-        productId: {
+        tripId: {
           type: Schema.Types.ObjectId,
-          ref: 'Product',
-          required: true
-        },
-        quantity: { type: Number, required: true },
-        price: {
-          type: Number,
+          ref: 'Trip',
           required: true
         }
       }
@@ -36,38 +31,36 @@ const userSchema = new Schema({
   }
 });
 
-userSchema.methods.addToCart = function(product) {
-  const cartProductIndex = this.cart.items.findIndex(cp => {
-    return cp.productId.toString() === product._id.toString();
+userSchema.methods.addToTrips = function(trip) {
+  const TripPlaceIndex = this.trip.places.findIndex(cp => {
+    return cp.tripId.toString() === trip._id.toString();
   });
-  const updatedCartItems = [...this.cart.items];
+  const updatedTripPlaces = [...this.trip.places];
 
-  if (cartProductIndex >= 0) {
-    updatedCartItems[cartProductIndex].quantity += 1;
+  if (TripPlaceIndex >= 0) {
+    updatedTripPlaces[TripPlaceIndex].quantity += 1;
   } else {
-    updatedCartItems.push({
-      productId: product._id,
-      quantity: 1,
-      price: product.price
+    updatedTripPlaces.push({
+      tripId: trip._id,
     });
   }
-  const updatedCart = {
-    items: updatedCartItems
+  const updatedTrip = {
+    places: updatedTripPlaces
   };
-  this.cart = updatedCart;
+  this.trip = updatedTrip;
   return this.save();
 };
 
-userSchema.methods.removeFromCart = function(productId) {
-  const updatedCartItems = this.cart.items.filter(item => {
-    return item.productId.toString() !== productId.toString();
+userSchema.methods.removeFromTrips = function(tripId) {
+  const updatedTripPlaces = this.trip.places.filter(trip => {
+    return trip.tripId.toString() !== tripId.toString();
   });
-  this.cart.items = updatedCartItems;
+  this.trip.places = updatedTripPlaces;
   return this.save();
 };
 
-userSchema.methods.clearCart = function() {
-  this.cart = { items: [] };
+userSchema.methods.clearTrips = function() {
+  this.trip = { places: [] };
   return this.save();
 };
 
