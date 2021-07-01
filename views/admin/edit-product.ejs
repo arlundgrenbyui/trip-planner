@@ -1,6 +1,7 @@
 <%- include('../includes/head.ejs') %>
     <link rel="stylesheet" href="/css/forms.css">
     <link rel="stylesheet" href="/css/product.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 </head>
 
 <body>
@@ -10,15 +11,15 @@
         <% if (errorMessage) { %>
             <div class="user-message user-message--error"><%= errorMessage %></div>
         <% } %>
-        <form class="product-form" action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST">
+        <form class="product-form" action="/admin/<% if (editing) { %>edit-trip<% } else { %>add-trip<% } %>" method="POST">
             <div class="form-control">
                 <label for="title">Title</label>
                 <input 
                     class="<%= validationErrors.find(e => e.param === 'title') ? 'invalid' : '' %>"
                     type="text" 
                     name="title" 
-                    id="title" 
-                    value="<% if (editing || hasError) { %><%= product.title %><% } %>">
+                    id="title"  
+                    value="<% if (editing || hasError) { %><%= trip.name %><% } %>">
             </div>
             <div class="form-control">
                 <label for="imageUrl">Image URL</label>
@@ -27,17 +28,44 @@
                     type="text" 
                     name="imageUrl" 
                     id="imageUrl" 
-                    value="<% if (editing || hasError) { %><%= product.imageUrl %><% } %>">
+                    value="<% if (editing || hasError) { %><%= trip.imageUrl %><% } %>">
             </div>
             <div class="form-control">
-                <label for="price">Price</label>
-                <input 
-                    class="<%= validationErrors.find(e => e.param === 'price') ? 'invalid' : '' %>"
-                    type="number" 
-                    name="price" 
-                    id="price" 
-                    step="0.01" 
-                    value="<% if (editing || hasError) { %><%= product.price %><% } %>">
+                <input
+                    name="destLatLng"
+                    id="destLatLng"
+                    type="hidden"
+                />
+                <input
+                    name="origLatLng"
+                    id="origLatLng"
+                    type="hidden"
+                />
+                <div style="display: none">
+                    <input
+                        name="origin"
+                        id="origin-input"
+                        class="controls"
+                        type="text"
+                        placeholder="Enter an origin location"
+                    />
+                
+                    <input
+                        name="destination"
+                        id="destination-input"
+                        class="controls"
+                        type="text"
+                        placeholder="Enter a destination location"
+                    />
+                    
+                </div>
+        
+                <div id="map"></div>
+                <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+                <script
+                    src="https://maps.googleapis.com/maps/api/js?key=<%= api_key %>&callback=initMap&libraries=places&v=weekly"
+                    async
+                ></script>
             </div>
             <div class="form-control">
                 <label for="description">Description</label>
@@ -45,14 +73,14 @@
                     class="<%= validationErrors.find(e => e.param === 'description') ? 'invalid' : '' %>"
                     name="description" 
                     id="description" 
-                    rows="5"><% if (editing || hasError) { %><%= product.description %><% } %></textarea>
+                    rows="5"><% if (editing || hasError) { %><%= trip.description %><% } %></textarea>
             </div>
             <% if (editing) { %>
-                <input type="hidden" value="<%= product._id %>" name="productId">
+                <input type="hidden" value="<%= trip._id %>" name="tripId">
             <% } %>
 
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button class="btn" type="submit"><% if (editing) { %>Update Product<% } else { %>Add Product<% } %></button>
+            <button class="btn" type="submit"><% if (editing) { %>Update Trip<% } else { %>Add Trip<% } %></button>
         </form>
     </main>
 <%- include('../includes/end.ejs') %>

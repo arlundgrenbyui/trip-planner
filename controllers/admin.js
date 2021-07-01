@@ -1,7 +1,8 @@
 const { validationResult } = require('express-validator/check');
-
+require('dotenv').config();
 const Product = require('../models/product');
 const Trip = require('../models/trip');
+const fetch = require('node-fetch');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -10,6 +11,7 @@ exports.getAddProduct = (req, res, next) => {
     editing: false,
     hasError: false,
     errorMessage: null,
+    api_key: process.env.GOOGLE_MAPS_API_KEY,
     validationErrors: []
   });
 };
@@ -21,6 +23,7 @@ exports.getAddTrip = (req, res, next) => {
     editing: false,
     hasError: false,
     errorMessage: null,
+    api_key: process.env.GOOGLE_MAPS_API_KEY,
     validationErrors: []
   });
 };
@@ -28,9 +31,13 @@ exports.getAddTrip = (req, res, next) => {
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
-  const price = req.body.price;
+  const origin = req.body.origin;
+  const destination = req.body.destination;
   const description = req.body.description;
   const errors = validationResult(req);
+
+  console.log(origin);
+  console.log(destination);
 
   if (!errors.isEmpty()) {
     console.log(errors.array());
@@ -74,59 +81,69 @@ exports.postAddProduct = (req, res, next) => {
 
 exports.postAddTrip = (req, res, next) => {
   const name = req.body.name;
-  // const imageUrl = req.body.imageUrl;
-  const location = req.body.location;
+  const imageUrl = req.body.imageUrl;
+  const origin = req.body.origin;
+  const destination = req.body.destination;
+  const originLocation = req.body.origLatLng;
+  const destinationLocation = req.body.destLatLng;
   const description = req.body.description;
   const plannedDate = req.body.plannedDate;
-  const weather = req.body.weather;
-  const directions = req.body.directions;
-  const recommendations = req.body.recommendations;
+  const levelOfIntensity = req.body.levelOfIntensity;
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(422).render('admin/edit-product', {
-      pageTitle: 'Add Trip',
-      path: '/admin/edit-trip',
-      editing: false,
-      hasError: true,
-      trip: {
-        name: name,
-        location: location,
-        description: description,
-        plannedDate: plannedDate,
-        weather: weather,
-        directions: directions,
-        recommendations: recommendations,
-      },
-      errorMessage: errors.array()[0].msg,
-      validationErrors: errors.array()
-    });
-  }
+  this.getWeatherData(destination).then(weatherData => {
+    if (!errors.isEmpty()) {
+      console.log(errors.array());
+      return res.status(422).render('admin/edit-product', {
+        pageTitle: 'Add Trip',
+        path: '/admin/edit-trip',
+        editing: false,
+        hasError: true,
+        trip: {
+          name: name,
+          origin: origin,
+          destination: destination,
+          originLocation: originLocation,
+          destinationLocation: destinationLocation,
+          description: description,
+          plannedDate: plannedDate,
+          weather: weatherData,
+          levelOfIntensity: levelOfIntensity,
+          imageUrl: imageUrl
+        },
+        api_key: process.env.GOOGLE_MAPS_API_KEY,
+        errorMessage: errors.array()[0].msg,
+        validationErrors: errors.array()
+      });
+    }
 
-  const trip = new Trip({
-    name: name,
-    location: location,
-    description: description,
-    plannedDate: plannedDate,
-    weather: weather,
-    directions: directions,
-    recommendations: recommendations,
-    userId: req.user
+    const trip = new Trip({
+      name: name,
+      origin: origin,
+      destination: destination,
+      originLocation: originLocation,
+      destinationLocation: destinationLocation,
+      description: description,
+      plannedDate: plannedDate,
+      weather: weatherData,
+      levelOfIntensity: levelOfIntensity,
+      imageUrl: imageUrl,
+      userId: req.user
+    });
+
+    trip
+      .save()
+      .then(result => {
+        // console.log(result);
+        console.log('Created Trip');
+        res.redirect('/admin/trips');
+      })
+      .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
   });
-
-  trip
-    .save()
-    .then(result => {
-      // console.log(result);
-      console.log('Created Trip');
-      res.redirect('/admin/trips');
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -145,6 +162,7 @@ exports.getEditProduct = (req, res, next) => {
         path: '/admin/edit-product',
         editing: editMode,
         product: product,
+        api_key: process.env.GOOGLE_MAPS_API_KEY,
         hasError: false,
         errorMessage: null,
         validationErrors: []
@@ -174,6 +192,7 @@ exports.getEditTrip = (req, res, next) => {
         path: '/admin/edit-trip',
         editing: editMode,
         trip: trip,
+        api_key: process.env.GOOGLE_MAPS_API_KEY,
         hasError: false,
         errorMessage: null,
         validationErrors: []
@@ -201,6 +220,7 @@ exports.postEditProduct = (req, res, next) => {
       pageTitle: 'Edit Product',
       path: '/admin/edit-product',
       editing: true,
+      api_key: process.env.GOOGLE_MAPS_API_KEY,
       hasError: true,
       product: {
         title: updatedTitle,
@@ -239,59 +259,68 @@ exports.postEditProduct = (req, res, next) => {
 exports.postEditTrip = (req, res, next) => {
   const tripId = req.body.tripId;
   const name = req.body.name;
-  // const imageUrl = req.body.imageUrl;
-  const location = req.body.location;
+  const imageUrl = req.body.imageUrl;
+  const origin = req.body.origin;
+  const destination = req.body.destination;
+  const originLocation = req.body.origLatLng;
+  const destinationLocation = req.body.destLatLng;
   const description = req.body.description;
   const plannedDate = req.body.plannedDate;
-  const weather = req.body.weather;
-  const directions = req.body.directions;
-  const recommendations = req.body.recommendations;
-
+  const levelOfIntensity = req.body.levelOfIntensity;
   const errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    return res.status(422).render('admin/edit-trip', {
-      pageTitle: 'Edit Trip',
-      path: '/admin/edit-trip',
-      editing: true,
-      hasError: true,
-      trip: {
-        name: name,
-        location: location,
-        description: description,
-        plannedDate: plannedDate,
-        weather: weather,
-        directions: directions,
-        recommendations: recommendations,
-        _id: tripId
-      },
-      errorMessage: errors.array()[0].msg,
-      validationErrors: errors.array()
-    });
-  }
-
-  Trip.findById(tripId)
-    .then(trip => {
-      if (trip.userId.toString() !== req.user._id.toString()) {
-        return res.redirect('/');
-      }
-      trip.name = name;
-      trip.location = location;
-      trip.description = description;
-      trip.plannedDate = plannedDate;
-      trip.weather = weather;
-      trip.directions = directions;
-      trip.recommendations = recommendations;
-      return trip.save().then(result => {
-        console.log('UPDATED TRIP!');
-        res.redirect('/admin/trips');
+  this.getWeatherData(destination).then(weatherData => {
+    if (!errors.isEmpty()) {
+      return res.status(422).render('admin/edit-trip', {
+        pageTitle: 'Edit Trip',
+        path: '/admin/edit-trip',
+        editing: true,
+        api_key: process.env.GOOGLE_MAPS_API_KEY,
+        hasError: true,
+        trip: {
+          name: name,
+          origin: origin,
+          destination: destination,
+          originLocation: originLocation,
+          destinationLocation: destinationLocation,
+          description: description,
+          plannedDate: plannedDate,
+          weather: weatherData,
+          levelOfIntensity: levelOfIntensity,
+          imageUrl: imageUrl,
+          _id: tripId
+        },
+        errorMessage: errors.array()[0].msg,
+        validationErrors: errors.array()
       });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    }
+
+    Trip.findById(tripId)
+      .then(trip => {
+        if (trip.userId.toString() !== req.user._id.toString()) {
+          return res.redirect('/');
+        }
+        trip.name = name;
+        trip.origin = origin;
+        trip.destination = destination;
+        trip.originLocation = originLocation;
+        trip.destinationLocation = destinationLocation;
+        trip.description = description;
+        trip.plannedDate = plannedDate;
+        trip.weather = weatherData;
+        trip.levelOfIntensity = levelOfIntensity;
+        trip.imageUrl = imageUrl;
+        return trip.save().then(result => {
+          console.log('UPDATED TRIP!');
+          res.redirect('/admin/trips');
+        });
+      })
+      .catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
+  });
 };
 
 
@@ -355,4 +384,21 @@ exports.postDeleteTrip = (req, res, next) => {
       error.httpStatusCode = 500;
       return next(error);
     });
+};
+
+exports.getWeatherData = (location) => {
+  const loc = location.split(',');
+  const lat = loc[0].slice(1);
+  const lon = loc[1].slice(1,-1);
+  const api = process.env.OPENWEATHERMAP_API_KEY;
+  return fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${api}`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      return data;
+    });
+};
+
+exports.getRecommendations = () => {
+  return "clothes and water";
 };

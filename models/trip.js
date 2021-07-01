@@ -7,7 +7,19 @@ const tripSchema = new Schema({
     type: String,
     required: true
   },
-  location: {
+  origin: {
+    type: String,
+    required: true
+  },
+  destination: {
+    type: String,
+    required: true
+  },
+  originLocation: {
+    type: String,
+    required: true
+  },
+  destinationLocation: {
     type: String,
     required: true
   },
@@ -19,11 +31,7 @@ const tripSchema = new Schema({
     type: String,
     required: true
   },
-  directions: {
-    type: String,
-    required: true
-  },
-  recommendations: {
+  levelOfIntensity: {
     type: String,
     required: true
   },

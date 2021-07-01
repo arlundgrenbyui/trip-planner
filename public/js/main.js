@@ -40,12 +40,12 @@ class AutocompleteDirectionsHandler {
     const destinationInput = document.getElementById("destination-input");
     const originAutocomplete = new google.maps.places.Autocomplete(originInput);
     // Specify just the place data fields that you need.
-    originAutocomplete.setFields(["place_id"]);
+    //originAutocomplete.setFields(["place_id"]);
     const destinationAutocomplete = new google.maps.places.Autocomplete(
       destinationInput
     );
     // Specify just the place data fields that you need.
-    destinationAutocomplete.setFields(["place_id"]);
+    //destinationAutocomplete.setFields(["place_id"]);
 
     this.setupPlaceChangedListener(originAutocomplete, "ORIG");
     this.setupPlaceChangedListener(destinationAutocomplete, "DEST");
@@ -66,8 +66,10 @@ class AutocompleteDirectionsHandler {
 
       if (mode === "ORIG") {
         this.originPlaceId = place.place_id;
+        document.getElementById('origLatLng').value = place.geometry.location;
       } else {
         this.destinationPlaceId = place.place_id;
+        document.getElementById('destLatLng').value = place.geometry.location;
       }
       this.route();
     });
