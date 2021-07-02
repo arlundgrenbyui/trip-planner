@@ -43,6 +43,10 @@ router.post(
       .isString()
       .isLength({ min: 3 })
       .trim(),
+    body('origLng')
+      .isString()
+      .isLength({ min: 3 })
+      .trim(),
     body('imageUrl').isURL(),
     body('description')
       .isLength({ min: 5, max: 400 })

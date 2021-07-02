@@ -30,8 +30,6 @@ exports.postAddTrip = (req, res, next) => {
   const levelOfIntensity = req.body.levelOfIntensity;
   const errors = validationResult(req);
 
-  console.log(req.body);
-
   this.getWeatherData(destinationLat, destinationLng).then(weatherData => {
     if (!errors.isEmpty()) {
       console.log(errors.array());
@@ -210,6 +208,28 @@ exports.getTrips = (req, res, next) => {
     });
 };
 
+exports.postStartTrip = (req,res,next) => {
+  Trip.findById(req.body.tripId)
+    .then(trip => {
+      if (trip.userId.toString() !== req.user._id.toString()) {
+        return res.redirect('/');
+      }
+      res.redirect('/admin/trip-started');
+      return transporter.sendMail({
+        to: email,
+        from: 'Kyle Mueller<kyle.mueller.ghs@gmail.com>',
+        subject: 'Account Created Successfully!',
+        html: `<h1>Congrats on starting your trip!</h1>\n<p>Click here to begin your adventure: 
+        https://www.google.com/maps/dir/?api=1&origin=${trip.originLat},${trip.originLng}&destination=${trip.destinationLat},${trip.destinationLng}</p>`
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+}
+
 exports.postDeleteTrip = (req, res, next) => {
   const tripId = req.body.tripId;
   Trip.deleteOne({ _id: tripId, userId: req.user._id })
@@ -225,13 +245,10 @@ exports.postDeleteTrip = (req, res, next) => {
 };
 
 exports.getWeatherData = (lat, lng) => {
-  // console.log(lat);
-  // console.log(lng);
   const api = process.env.OPENWEATHERMAP_API_KEY;
-  return fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&appid=${api}`)
+  return fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&units=imperial&appid=${api}`)
     .then(response => response.json())
     .then(data => {
-      // console.log(data);
       return data;
     });
 };
