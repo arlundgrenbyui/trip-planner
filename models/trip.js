@@ -15,25 +15,33 @@ const tripSchema = new Schema({
     type: String,
     required: true
   },
-  originLocation: {
+  originLat: {
     type: String,
     required: true
   },
-  destinationLocation: {
+  originLng: {
+    type: String,
+    required: true
+  },
+  destinationLat: {
+    type: String,
+    required: true
+  },
+  destinationLng: {
     type: String,
     required: true
   },
   plannedDate: {
     type: Date,
-    required: true
+    required: false
   },
   weather: {
-    type: String,
+    type: JSON,
     required: true
   },
   levelOfIntensity: {
     type: String,
-    required: true
+    required: false
   },
   imageUrl: {
     type: String,

@@ -13,12 +13,12 @@
         <% } %>
         <form class="product-form" action="/admin/<% if (editing) { %>edit-trip<% } else { %>add-trip<% } %>" method="POST">
             <div class="form-control">
-                <label for="title">Title</label>
+                <label for="name">Name</label>
                 <input 
-                    class="<%= validationErrors.find(e => e.param === 'title') ? 'invalid' : '' %>"
+                    class="<%= validationErrors.find(e => e.param === 'name') ? 'invalid' : '' %>"
                     type="text" 
-                    name="title" 
-                    id="title"  
+                    name="name" 
+                    id="name"  
                     value="<% if (editing || hasError) { %><%= trip.name %><% } %>">
             </div>
             <div class="form-control">
@@ -32,15 +32,26 @@
             </div>
             <div class="form-control">
                 <input
-                    name="destLatLng"
-                    id="destLatLng"
+                    name="destLat"
+                    id="destLat"
                     type="hidden"
                 />
                 <input
-                    name="origLatLng"
-                    id="origLatLng"
+                    name="destLng"
+                    id="destLng"
                     type="hidden"
                 />
+                <input
+                    name="origLat"
+                    id="origLat"
+                    type="hidden"
+                />
+                <input
+                    name="origLng"
+                    id="origLng"
+                    type="hidden"
+                />
+                
                 <div style="display: none">
                     <input
                         name="origin"

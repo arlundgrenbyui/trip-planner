@@ -65,11 +65,13 @@ class AutocompleteDirectionsHandler {
       }
 
       if (mode === "ORIG") {
+        document.getElementById('origLat').value = place.geometry.location.lat();
+        document.getElementById('origLng').value = place.geometry.locating.lng();
         this.originPlaceId = place.place_id;
-        document.getElementById('origLatLng').value = place.geometry.location;
       } else {
+        document.getElementById('destLat').value = place.geometry.location.lat();
+        document.getElementById('destLng').value = place.geometry.location.lng();
         this.destinationPlaceId = place.place_id;
-        document.getElementById('destLatLng').value = place.geometry.location;
       }
       this.route();
     });
