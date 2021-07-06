@@ -17,6 +17,7 @@ exports.getAddTrip = (req, res, next) => {
 };
 
 exports.postAddTrip = (req, res, next) => {
+  console.log(req.body);
   const name = req.body.name;
   const imageUrl = req.body.imageUrl;
   const origin = req.body.origin;
@@ -75,17 +76,34 @@ exports.postAddTrip = (req, res, next) => {
     });
 
     trip
-      .save()
-      .then(result => {
-        // console.log(result);
-        console.log('Created Trip');
-        res.redirect('/admin/trips');
-      })
-      .catch(err => {
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-      });
+    .save()
+    .then(result => {
+      // console.log(result);
+      console.log('Created Trip');
+      res.redirect('/admin/trips');
+    })
+    // .then(
+    //   Trip.find({ userId: req.user._id })
+    //   .then(trips => {
+    //     console.log(trips);
+    //     res.redirect('admin/trips', {
+    //       trips: trips,
+    //       pageTitle: 'Admin Trips',
+    //       path: '/admin/trips'
+    //     });
+    //   })
+    //   .catch(err => {
+    //     const error = new Error(err);
+    //     error.httpStatusCode = 500;
+    //     return next(error);
+    //   })
+    // )
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+
   });
 };
 

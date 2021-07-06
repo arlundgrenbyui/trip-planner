@@ -1,0 +1,61 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/product.css">
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    </head>
+
+    <body>
+        <%- include('../includes/header.ejs') %>
+
+            <main>
+                <% if (trips.length > 0) { %>
+                    <div class="grid">
+                        <% for (let trip of trips) { %>
+                            <article class="card product-item">
+                                <header class="card__header">
+                                    <h1 class="product__title">
+                                        <%= trip.name %>
+                                    </h1>
+                                    <div class="centered">
+                                        <span><%= trip.origin %></span>
+                                        <br>
+                                        <span>to</span>
+                                        <br>
+                                        <span><%= trip.destination %></span>
+                                    </div>
+                                </header>
+                                <div class="card__image">
+                                    <img src="<%= trip.imageUrl %>" alt="<%= trip.name %>">
+                                </div>
+                                <!-- Change this to weather data -->
+                                <div class="card__content">
+                                    <p class="centered">Today's Temperature</p>
+                                    <h2 class="product__price">
+                                        <i class='fas fa-sun'></i>
+                                        <%= trip.weather.current.temp %>°F
+                                    </h2>
+                                    <p class="product__price"><%= trip.weather.current.weather[0].description %></p>
+                                    <br>
+                                    <p class="centered">Planned Date</p>
+                                    <h2 class="product__price">
+                                        <% if (trip.plannedDate) { %>
+                                            <%= trip.plannedDate.toISOString().split('T')[0] %>
+                                        <% }; %>
+                                    </h2>
+                                </div>
+                                <div class="card__actions">
+                                    <a href="/admin/edit-product/<%= trip._id %>?edit=true" class="btn">Edit</a>
+                                    <form action="/admin/delete-product" method="POST">
+                                        <input type="hidden" value="<%= trip._id %>" name="tripId">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <button class="btn" type="submit">Delete</button>
+                                    </form>
+
+                                </div>
+                            </article>
+                            <% } %>
+                    </div>
+                    <% } else { %>
+                        <h1>No Products Found!</h1>
+                        <% } %>
+            </main>
+            <%- include('../includes/end.ejs') %>

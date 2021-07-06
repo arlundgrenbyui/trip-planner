@@ -14,7 +14,7 @@ router.get('/add-product', isAuth, adminController.getAddProduct);
 router.get('/add-trip', isAuth, adminController.getAddTrip);
 
 // /admin/products => GET
-router.get('/products', isAuth, adminController.getProducts);
+// router.get('/products', isAuth, adminController.getProducts);
 
 router.get('/trips', isAuth, adminController.getTrips);
 

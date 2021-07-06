@@ -79,6 +79,18 @@
                 ></script>
             </div>
             <div class="form-control">
+                <label for="plannedDate">Date</label>
+                <input type="date" id="plannedDate" name="plannedDate" style="font-size:15px;">
+            </div>
+            <div class="form-control">
+                <label for="levelOfIntensity">Level of Intensity</label>
+                <select name="levelOfIntensity" id="levelOfIntensity" style="width:100%;font-size:15px;">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <div class="form-control">
                 <label for="description">Description</label>
                 <textarea 
                     class="<%= validationErrors.find(e => e.param === 'description') ? 'invalid' : '' %>"
