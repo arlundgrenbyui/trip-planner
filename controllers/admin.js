@@ -212,7 +212,16 @@ exports.postEditTrip = (req, res, next) => {
 exports.getTrips = (req, res, next) => {
   Trip.find({ userId: req.user._id })
     .then(trips => {
-      // console.log(products);
+      const time = new Date().getTime();
+      for (let trip of trips) {
+        if (trip.weather.current == undefined || (time - trip.weather.current.dt > 86400)) {
+          this.getWeatherData(trip.destinationLat, trip.destinationLng)
+            .then(weather => {
+              trip.weather = weather;
+              trip.save();
+            });
+        }
+      }
       res.render('admin/trips', {
         trips: trips,
         pageTitle: 'Admin Trips',

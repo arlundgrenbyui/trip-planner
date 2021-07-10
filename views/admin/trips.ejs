@@ -30,7 +30,22 @@
                                 <div class="card__content">
                                     <p class="centered">Today's Temperature</p>
                                     <h2 class="product__price">
-                                        <i class='fas fa-sun'></i>
+                                        <% const description = trip.weather.current.weather[0].description; %>
+                                        <% if (description.includes("clear")) { %>
+                                            <i class='fas fa-sun'></i>
+                                        <% } else if (description.includes("clouds")) { %>
+                                            <i class='fas fa-cloud-sun'></i>
+                                        <% } else if (description.includes("clouds")) { %>
+                                            <i class='fas fa-cloud'></i>
+                                        <% } else if (description.includes("thunderstorm")) { %>
+                                            <i class='fas fa-bolt'></i>
+                                        <% } else if (description.includes("freezing")) { %>
+                                            <i class='fas fa-temperature-low'></i>
+                                        <% } else if (description.includes("snow") || description.includes("sleet") || description.includes("hail")) { %>
+                                            <i class='fas fa-snowflake'></i>
+                                        <% } else if (description.includes("drizzle") || description.includes("rain")) { %>
+                                            <i class='fas fa-cloud-rain'></i>
+                                        <% } %>
                                         <%= trip.weather.current.temp %>°F
                                     </h2>
                                     <p class="product__price"><%= trip.weather.current.weather[0].description %></p>
