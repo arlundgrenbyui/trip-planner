@@ -18,6 +18,8 @@ router.get('/add-trip', isAuth, adminController.getAddTrip);
 
 router.get('/trips', isAuth, adminController.getTrips);
 
+router.get('/trips/:tripId', adminController.getTrip);
+
 // /admin/add-product => POST
 router.post(
   '/add-product',

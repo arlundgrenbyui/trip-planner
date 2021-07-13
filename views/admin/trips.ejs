@@ -1,5 +1,5 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="/css/trip.css">
     <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
     </head>
 
@@ -10,9 +10,9 @@
                 <% if (trips.length > 0) { %>
                     <div class="grid">
                         <% for (let trip of trips) { %>
-                            <article class="card product-item">
+                            <article class="card trip-item clickable" onclick="location.href='/trips/<%= trip._id %>'">
                                 <header class="card__header">
-                                    <h1 class="product__title">
+                                    <h1 class="trip__title">
                                         <%= trip.name %>
                                     </h1>
                                     <div class="centered">
@@ -29,7 +29,7 @@
                                 <!-- Change this to weather data -->
                                 <div class="card__content">
                                     <p class="centered">Today's Temperature</p>
-                                    <h2 class="product__price">
+                                    <h2 class="trip__price">
                                         <% const description = trip.weather.current.weather[0].description; %>
                                         <% if (description.includes("clear")) { %>
                                             <i class='fas fa-sun'></i>
@@ -48,10 +48,10 @@
                                         <% } %>
                                         <%= trip.weather.current.temp %>°F
                                     </h2>
-                                    <p class="product__price"><%= trip.weather.current.weather[0].description %></p>
+                                    <p class="trip__price"><%= trip.weather.current.weather[0].description %></p>
                                     <br>
                                     <p class="centered">Planned Date</p>
-                                    <h2 class="product__price">
+                                    <h2 class="trip__price">
                                         <% if (trip.plannedDate) { %>
                                             <%= trip.plannedDate.toISOString().split('T')[0] %>
                                         <% }; %>
@@ -70,7 +70,7 @@
                             <% } %>
                     </div>
                     <% } else { %>
-                        <h1>No Products Found!</h1>
+                        <h1>No Trips Found!</h1>
                         <% } %>
             </main>
             <%- include('../includes/end.ejs') %>

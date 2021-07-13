@@ -284,7 +284,22 @@ exports.getRecommendations = () => {
   return "clothes and water";
 };
 
-
+exports.getTrip = (req, res, next) => {
+  const tripId = req.params.tripId;
+  Trip.findById(tripId)
+    .then(trip => {
+      res.render('trips/trip-detail', {
+        trip: trip,
+        pageTitle: trip.name,
+        path: '/trips'
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
 
 
 
