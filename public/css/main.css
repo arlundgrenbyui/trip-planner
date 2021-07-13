@@ -90,7 +90,6 @@ main {
   padding: 1rem;
   margin: auto;
   overflow: auto;
-  padding-bottom: 5em;
 }
 
 form {
@@ -98,10 +97,14 @@ form {
 }
 
 hr {
-  color: var(--dark-clr);
-  background-color: var(--dark-clr);
+  color: var(--background-clr);
+  background-color: var(--background-clr);
   height: 1px;
   border: none;
+}
+
+.big {
+  font-size: 42px;
 }
 
 .intro {
@@ -116,7 +119,7 @@ hr {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }
 
-.description {
+.details {
   background-color: var(--dark-clr);
   margin: 15px 0px;
   padding: 10px 20px;
@@ -201,7 +204,7 @@ hr {
   width: 100%;
 }
 
-.product-img {
+.trip-img {
   left: 0;
   top: 0;
   height: auto;
@@ -217,7 +220,7 @@ hr {
   overflow: hidden;
 }
 
-.product-description-smol {
+.trip-description-smol {
   all: inherit;
   text-align: left;
   white-space: pre-wrap;
@@ -226,18 +229,18 @@ hr {
   font-size: 15px;
 }
 
-.product-description {
+.trip-details {
   all: inherit;
   text-align: left;
   white-space: pre-wrap;
   box-shadow: none;
   background-color: none;
-  padding: 1em 0em;
+  padding: 0.5em 0em;
   margin: 0;
-  line-height: 185%;
+  font-size: larger;
 }
 
-.product-page {
+.trip-page {
   text-align: center;
   flood-color: var(--dark-clr);
 }
@@ -384,6 +387,17 @@ hr {
   flex-wrap: wrap;
   justify-content: space-evenly;
   align-items: stretch;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto auto;
+}
+
+.grid-item {
+  border: 1px solid var(--background-clr);
+  padding: 10px;
+  text-align: center;
 }
 
 .clickable {

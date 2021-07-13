@@ -224,6 +224,7 @@ exports.getTrips = (req, res, next) => {
       }
       res.render('admin/trips', {
         trips: trips,
+        getWeatherIcon: this.getWeatherIcon,
         pageTitle: 'Admin Trips',
         path: '/admin/trips'
       });
@@ -288,10 +289,11 @@ exports.getTrip = (req, res, next) => {
   const tripId = req.params.tripId;
   Trip.findById(tripId)
     .then(trip => {
-      res.render('trips/trip-detail', {
+      res.render('admin/trip-detail', {
         trip: trip,
+        getWeatherIcon: this.getWeatherIcon,
         pageTitle: trip.name,
-        path: '/trips'
+        path: '/admin/trips'
       });
     })
     .catch(err => {
@@ -301,10 +303,27 @@ exports.getTrip = (req, res, next) => {
     });
 };
 
-
-
-
-
+exports.getWeatherIcon = (description) => {
+  if (description.includes("clear")) { 
+    return "sun";
+  } else if (description.includes("few clouds")) { 
+    return "cloud-sun";
+  } else if (description.includes("clouds")) { 
+    return "cloud";
+  } else if (description.includes("thunderstorm")) { 
+    return "bolt";
+  } else if (description.includes("freezing")) { 
+    return "temperature-low";
+  } else if (description.includes("snow") || description.includes("sleet") || description.includes("hail")) { 
+    return "snowflake";
+  } else if (description.includes("drizzle") || description.includes("rain")) { 
+      if (description.includes("light")) { 
+        return "cloud-rain";
+      } else { 
+        return "cloud-showers-heavy";
+      } 
+  } 
+}
 
 
 

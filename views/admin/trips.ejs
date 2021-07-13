@@ -10,9 +10,9 @@
                 <% if (trips.length > 0) { %>
                     <div class="grid">
                         <% for (let trip of trips) { %>
-                            <article class="card trip-item clickable" onclick="location.href='/trips/<%= trip._id %>'">
+                            <article class="card trip-item clickable" onclick="location.href='/admin/trips/<%= trip._id %>'">
                                 <header class="card__header">
-                                    <h1 class="trip__title">
+                                    <h1 class="trip__name">
                                         <%= trip.name %>
                                     </h1>
                                     <div class="centered">
@@ -29,31 +29,16 @@
                                 <!-- Change this to weather data -->
                                 <div class="card__content">
                                     <p class="centered">Today's Temperature</p>
-                                    <h2 class="trip__price">
-                                        <% const description = trip.weather.current.weather[0].description; %>
-                                        <% if (description.includes("clear")) { %>
-                                            <i class='fas fa-sun'></i>
-                                        <% } else if (description.includes("clouds")) { %>
-                                            <i class='fas fa-cloud-sun'></i>
-                                        <% } else if (description.includes("clouds")) { %>
-                                            <i class='fas fa-cloud'></i>
-                                        <% } else if (description.includes("thunderstorm")) { %>
-                                            <i class='fas fa-bolt'></i>
-                                        <% } else if (description.includes("freezing")) { %>
-                                            <i class='fas fa-temperature-low'></i>
-                                        <% } else if (description.includes("snow") || description.includes("sleet") || description.includes("hail")) { %>
-                                            <i class='fas fa-snowflake'></i>
-                                        <% } else if (description.includes("drizzle") || description.includes("rain")) { %>
-                                            <i class='fas fa-cloud-rain'></i>
-                                        <% } %>
-                                        <%= trip.weather.current.temp %>°F
+                                    <h2 class="trip__detail">
+                                        <i class='fas fa-<%= getWeatherIcon(trip.weather.current.weather[0].description) %>'></i>
+                                        <%= Math.round(trip.weather.current.temp) %>°F
                                     </h2>
-                                    <p class="trip__price"><%= trip.weather.current.weather[0].description %></p>
+                                    <p class="trip__detail">with <%= trip.weather.current.weather[0].description %></p>
                                     <br>
                                     <p class="centered">Planned Date</p>
-                                    <h2 class="trip__price">
+                                    <h2 class="trip__detail">
                                         <% if (trip.plannedDate) { %>
-                                            <%= trip.plannedDate.toISOString().split('T')[0] %>
+                                            <%= trip.plannedDate.toDateString() %>
                                         <% }; %>
                                     </h2>
                                 </div>

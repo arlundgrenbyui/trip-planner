@@ -1,0 +1,45 @@
+<%- include('../includes/head.ejs') %>
+<script>
+    function mOver() {
+        document.getElementById("zoomer").style.transform = 'scale(2)';
+    }
+    function mOut() {
+        document.getElementById("zoomer").style.transform = 'scale(1)';
+    }
+    function mMove(e) {
+        let el = document.getElementById("zoomer");
+        let transOrig = (e.layerX / el.offsetWidth) * 100 + '% ' + (e.layerY / el.offsetHeight) * 100 +'%';
+        el.style.transformOrigin = transOrig;
+    }
+</script>
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    </head>
+
+    <body>
+        <%- include('../includes/header.ejs') %>
+        <main class="centered">
+            <h1 class="title"><%= trip.name %></h1>
+            <br>
+            <div class="zoomable" onmouseover="mOver()" onmouseout="mOut()" onmousemove="mMove(event)">
+                <img src="<%= trip.imageUrl %>" id="zoomer" alt="<%= trip.name %>" class="trip-img">
+            </div>
+            <div class="details">
+                <p class="trip-details"><b>Planned Date:</b> <%= trip.plannedDate.toDateString() %></p><hr>
+                <p class="trip-details"><b>Origin:</b> <%= trip.origin %></p><hr>
+                <p class="trip-details"><b>Destination:</b> <%= trip.destination %></p><hr>
+                <p class="trip-details"><b>Forecast:</b></p>
+                <div class="grid-container">
+                    <% for (let day of trip.weather.daily) { %>
+                        <div class="grid-item">
+                            <p><%= new Date(day.dt * 1000).toDateString() %></p>
+                            <i class='fas fa-<%= getWeatherIcon(day.weather[0].description) %> big'></i>
+                            <p><%= Math.round(day.temp.min) %>°F • <%= Math.round(day.temp.max) %>°F</p>
+                        </div>
+                    <% } %>
+                </div>
+                <br>
+                <p class="trip-details"><b>Level Of Intensity:</b> <%= trip.levelOfIntensity %></p><hr>
+                <p class="trip-details"><b>Description:</b> <%= trip.description %></p>
+            </div>
+        </main>
+        <%- include('../includes/end.ejs') %>
