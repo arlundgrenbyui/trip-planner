@@ -187,10 +187,10 @@ exports.postEditTrip = (req, res, next) => {
         trip.name = name;
         trip.origin = origin;
         trip.destination = destination;
-        trip.originLat = originLat;
-        trip.originLng = originLng;
-        trip.destinationLat = destinationLat;
-        trip.destinationLng = destinationLng;
+        // trip.originLat = originLat;
+        // trip.originLng = originLng;
+        // trip.destinationLat = destinationLat;
+        // trip.destinationLng = destinationLng;
         trip.description = description;
         trip.plannedDate = plannedDate;
         trip.weather = weatherData;
