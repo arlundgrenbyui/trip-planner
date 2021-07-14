@@ -1,13 +1,12 @@
 const { validationResult } = require('express-validator/check');
 require('dotenv').config();
-const Product = require('../models/product');
 const Trip = require('../models/trip');
 const fetch = require('node-fetch');
 
 exports.getAddTrip = (req, res, next) => {
-  res.render('admin/edit-trip', {
+  res.render('user/edit-trip', {
     pageTitle: 'Add Trip',
-    path: '/admin/add-trip',
+    path: '/user/add-trip',
     editing: false,
     hasError: false,
     errorMessage: null,
@@ -34,9 +33,9 @@ exports.postAddTrip = (req, res, next) => {
   this.getWeatherData(destinationLat, destinationLng).then(weatherData => {
     if (!errors.isEmpty()) {
       console.log(errors.array());
-      return res.status(422).render('admin/edit-product', {
+      return res.status(422).render('user/edit-product', {
         pageTitle: 'Add Trip',
-        path: '/admin/edit-trip',
+        path: '/user/edit-trip',
         editing: false,
         hasError: true,
         trip: {
@@ -80,16 +79,16 @@ exports.postAddTrip = (req, res, next) => {
     .then(result => {
       // console.log(result);
       console.log('Created Trip');
-      res.redirect('/admin/trips');
+      res.redirect('/user/trips');
     })
     // .then(
     //   Trip.find({ userId: req.user._id })
     //   .then(trips => {
     //     console.log(trips);
-    //     res.redirect('admin/trips', {
+    //     res.redirect('user/trips', {
     //       trips: trips,
-    //       pageTitle: 'Admin Trips',
-    //       path: '/admin/trips'
+    //       pageTitle: 'user Trips',
+    //       path: '/user/trips'
     //     });
     //   })
     //   .catch(err => {
@@ -118,9 +117,9 @@ exports.getEditTrip = (req, res, next) => {
       if (!trip) {
         return res.redirect('/');
       }
-      res.render('admin/edit-trip', {
+      res.render('user/edit-trip', {
         pageTitle: 'Edit Trip',
-        path: '/admin/edit-trip',
+        path: '/user/edit-trip',
         editing: editMode,
         trip: trip,
         api_key: process.env.GOOGLE_MAPS_API_KEY,
@@ -153,9 +152,9 @@ exports.postEditTrip = (req, res, next) => {
 
   this.getWeatherData(destinationLat, destinationLng).then(weatherData => {
     if (!errors.isEmpty()) {
-      return res.status(422).render('admin/edit-trip', {
+      return res.status(422).render('user/edit-trip', {
         pageTitle: 'Edit Trip',
-        path: '/admin/edit-trip',
+        path: '/user/edit-trip',
         editing: true,
         api_key: process.env.GOOGLE_MAPS_API_KEY,
         hasError: true,
@@ -198,7 +197,7 @@ exports.postEditTrip = (req, res, next) => {
         trip.imageUrl = imageUrl;
         return trip.save().then(result => {
           console.log('UPDATED TRIP!');
-          res.redirect('/admin/trips');
+          res.redirect('/user/trips');
         });
       })
       .catch(err => {
@@ -214,7 +213,7 @@ exports.getTrips = (req, res, next) => {
     .then(trips => {
       const time = new Date().getTime();
       for (let trip of trips) {
-        if (trip.weather.current == undefined || (time - trip.weather.current.dt > 86400)) {
+        if (trip.weather.current == undefined || (time - (trip.weather.current.dt * 1000) > 86400)) {
           this.getWeatherData(trip.destinationLat, trip.destinationLng)
             .then(weather => {
               trip.weather = weather;
@@ -222,11 +221,11 @@ exports.getTrips = (req, res, next) => {
             });
         }
       }
-      res.render('admin/trips', {
+      res.render('user/my-trips', {
         trips: trips,
         getWeatherIcon: this.getWeatherIcon,
-        pageTitle: 'Admin Trips',
-        path: '/admin/trips'
+        pageTitle: 'My Trips',
+        path: '/user/my-trips'
       });
     })
     .catch(err => {
@@ -242,7 +241,7 @@ exports.postStartTrip = (req,res,next) => {
       if (trip.userId.toString() !== req.user._id.toString()) {
         return res.redirect('/');
       }
-      res.redirect('/admin/trip-started');
+      res.redirect('/user/trip-started');
       return transporter.sendMail({
         to: email,
         from: 'Kyle Mueller<kyle.mueller.ghs@gmail.com>',
@@ -263,7 +262,7 @@ exports.postDeleteTrip = (req, res, next) => {
   Trip.deleteOne({ _id: tripId, userId: req.user._id })
     .then(() => {
       console.log('DESTROYED TRIP');
-      res.redirect('/admin/trips');
+      res.redirect('/user/my-trips');
     })
     .catch(err => {
       const error = new Error(err);
@@ -289,11 +288,11 @@ exports.getTrip = (req, res, next) => {
   const tripId = req.params.tripId;
   Trip.findById(tripId)
     .then(trip => {
-      res.render('admin/trip-detail', {
+      res.render('user/trip-detail', {
         trip: trip,
         getWeatherIcon: this.getWeatherIcon,
         pageTitle: trip.name,
-        path: '/admin/trips'
+        path: '/user/my-trips'
       });
     })
     .catch(err => {
@@ -324,195 +323,3 @@ exports.getWeatherIcon = (description) => {
       } 
   } 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-exports.getAddProduct = (req, res, next) => {
-  res.render('admin/edit-product', {
-    pageTitle: 'Add Product',
-    path: '/admin/add-product',
-    editing: false,
-    hasError: false,
-    errorMessage: null,
-    api_key: process.env.GOOGLE_MAPS_API_KEY,
-    validationErrors: []
-  });
-};
-
-exports.postAddProduct = (req, res, next) => {
-  const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
-  const origin = req.body.origin;
-  const destination = req.body.destination;
-  const description = req.body.description;
-  const errors = validationResult(req);
-
-  console.log(origin);
-  console.log(destination);
-
-  if (!errors.isEmpty()) {
-    console.log(errors.array());
-    return res.status(422).render('admin/edit-product', {
-      pageTitle: 'Add Product',
-      path: '/admin/edit-product',
-      editing: false,
-      hasError: true,
-      product: {
-        title: title,
-        imageUrl: imageUrl,
-        price: price,
-        description: description
-      },
-      errorMessage: errors.array()[0].msg,
-      validationErrors: errors.array()
-    });
-  }
-
-  const product = new Product({
-    title: title,
-    price: price,
-    description: description,
-    imageUrl: imageUrl,
-    userId: req.user
-  });
-  product
-    .save()
-    .then(result => {
-      // console.log(result);
-      console.log('Created Product');
-      res.redirect('/admin/products');
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
-};
-
-exports.getEditProduct = (req, res, next) => {
-  const editMode = req.query.edit;
-  if (!editMode) {
-    return res.redirect('/');
-  }
-  const prodId = req.params.productId;
-  Product.findById(prodId)
-    .then(product => {
-      if (!product) {
-        return res.redirect('/');
-      }
-      res.render('admin/edit-product', {
-        pageTitle: 'Edit Product',
-        path: '/admin/edit-product',
-        editing: editMode,
-        product: product,
-        api_key: process.env.GOOGLE_MAPS_API_KEY,
-        hasError: false,
-        errorMessage: null,
-        validationErrors: []
-      });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
-};
-
-exports.postEditProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  const updatedTitle = req.body.title;
-  const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
-  const updatedDesc = req.body.description;
-
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(422).render('admin/edit-product', {
-      pageTitle: 'Edit Product',
-      path: '/admin/edit-product',
-      editing: true,
-      api_key: process.env.GOOGLE_MAPS_API_KEY,
-      hasError: true,
-      product: {
-        title: updatedTitle,
-        imageUrl: updatedImageUrl,
-        price: updatedPrice,
-        description: updatedDesc,
-        _id: prodId
-      },
-      errorMessage: errors.array()[0].msg,
-      validationErrors: errors.array()
-    });
-  }
-
-  Product.findById(prodId)
-    .then(product => {
-      if (product.userId.toString() !== req.user._id.toString()) {
-        return res.redirect('/');
-      }
-      product.title = updatedTitle;
-      product.price = updatedPrice;
-      product.description = updatedDesc;
-      product.imageUrl = updatedImageUrl;
-      return product.save().then(result => {
-        console.log('UPDATED PRODUCT!');
-        res.redirect('/admin/products');
-      });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
-};
-
-exports.getProducts = (req, res, next) => {
-  Product.find({ userId: req.user._id })
-    .then(products => {
-      // console.log(products);
-      res.render('admin/products', {
-        prods: products,
-        pageTitle: 'Admin Products',
-        path: '/admin/products'
-      });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
-};
-
-exports.postDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.deleteOne({ _id: prodId, userId: req.user._id })
-    .then(() => {
-      console.log('DESTROYED PRODUCT');
-      res.redirect('/admin/products');
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
-};

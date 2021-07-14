@@ -11,7 +11,7 @@
         <% if (errorMessage) { %>
             <div class="user-message user-message--error"><%= errorMessage %></div>
         <% } %>
-        <form class="product-form" action="/admin/<% if (editing) { %>edit-trip<% } else { %>add-trip<% } %>" method="POST">
+        <form class="product-form" action="/user/<% if (editing) { %>edit-trip<% } else { %>add-trip<% } %>" method="POST">
             <div class="form-control">
                 <label for="name">Name</label>
                 <input 
@@ -58,7 +58,11 @@
                         id="origin-input"
                         class="controls"
                         type="text"
-                        placeholder="Enter an origin location"
+                        <% if (editing || hasError) { %>
+                            value="<%= trip.origin %>"
+                        <% } else { %>
+                            placeholder="Enter an origin location"
+                        <% } %>    
                     />
                 
                     <input
@@ -66,17 +70,20 @@
                         id="destination-input"
                         class="controls"
                         type="text"
-                        placeholder="Enter a destination location"
+                        <% if (editing || hasError) { %>
+                            value="<%= trip.destination %>"
+                        <% } else { %>
+                            placeholder="Enter a destination location"
+                        <% } %>  
                     />
-                    
                 </div>
         
                 <div id="map"></div>
                 <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
                 <script
                     src="https://maps.googleapis.com/maps/api/js?key=<%= api_key %>&callback=initMap&libraries=places&v=weekly"
-                    async
-                ></script>
+                    async>
+                </script>
             </div>
             <div class="form-control">
                 <label for="plannedDate">Date</label>

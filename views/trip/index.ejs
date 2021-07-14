@@ -1,0 +1,42 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/trip.css">
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+</head>
+
+<body>
+    <%- include('../includes/header.ejs') %>
+
+    <main>
+        <% if (trips.length > 0) { %>
+            <div class="grid">
+                <% for (let trip of trips) { %>
+                    <article class="card trip-item clickable" onclick="location.href='/trips/<%= trip._id %>'">
+                        <header class="card__header">
+                            <h1 class="trip__name"><%= trip.name %></h1>
+                            <div class="centered">
+                                <span><%= trip.destination %></span>
+                            </div>
+                        </header>
+                        <div class="card__image">
+                            <img src="<%= trip.imageUrl %>"
+                                alt="<%= trip.name %>">
+                        </div>
+                        <div class="card__content">
+                            <p class="centered">Today's Temperature</p>
+                            <h2 class="trip__detail">
+                                <i class='fas fa-<%= getWeatherIcon(trip.weather.current.weather[0].description) %>'></i>
+                                <%= Math.round(trip.weather.current.temp) %>°F
+                            </h2>
+                            <p class="trip__detail">with <%= trip.weather.current.weather[0].description %></p>
+                        </div>
+                        <div class="card__actions">
+                            <a href="/trips/<%= trip._id %>" class="btn">Details</a>
+                        </div>
+                    </article>
+                <% } %>
+            </div>
+        <% } else { %>
+            <h1>No Trips Found!</h1>
+        <% } %>
+    </main>
+    <%- include('../includes/end.ejs') %>
