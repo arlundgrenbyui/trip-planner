@@ -17,6 +17,7 @@ exports.getTrip = (req, res, next) => {
   Trip.findById(tripId)
     .then(trip => {
       res.render('trip/trip-detail', {
+        message: null,
         trip: trip,
         getWeatherIcon: this.getWeatherIcon,
         pageTitle: trip.name,

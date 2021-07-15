@@ -1,7 +1,18 @@
 const { validationResult } = require('express-validator/check');
 require('dotenv').config();
 const Trip = require('../models/trip');
+const User = require('../models/user')
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
 const fetch = require('node-fetch');
+
+
+const API_KEY = process.env.SENDGRID_API_KEY;
+const transporter = nodemailer.createTransport(sendgridTransport({
+  auth: {
+    api_key: API_KEY
+  }
+}));
 
 exports.getAddTrip = (req, res, next) => {
   res.render('user/edit-trip', {
@@ -235,27 +246,27 @@ exports.getTrips = (req, res, next) => {
     });
 };
 
-exports.postStartTrip = (req,res,next) => {
-  Trip.findById(req.body.tripId)
-    .then(trip => {
-      if (trip.userId.toString() !== req.user._id.toString()) {
-        return res.redirect('/');
-      }
-      res.redirect('/user/trip-started');
-      return transporter.sendMail({
-        to: email,
-        from: 'Kyle Mueller<kyle.mueller.ghs@gmail.com>',
-        subject: 'Account Created Successfully!',
-        html: `<h1>Congrats on starting your trip!</h1>\n<p>Click here to begin your adventure: 
-        https://www.google.com/maps/dir/?api=1&origin=${trip.originLat},${trip.originLng}&destination=${trip.destinationLat},${trip.destinationLng}</p>`
-      });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
-}
+// exports.getStartTrip = (req,res,next) => {
+//   Trip.findById(req.body.tripId)
+//     .then(trip => {
+//       if (trip.userId.toString() !== req.user._id.toString()) {
+//         return res.redirect('/');
+//       }
+//       // res.redirect('/user/trip-started');
+//       return transporter.sendMail({
+//         to: email,
+//         from: 'Kyle Mueller<kyle.mueller.ghs@gmail.com>',
+//         subject: 'Account Created Successfully!',
+//         html: `<h1>Congrats on starting your trip!</h1>\n<p>Click here to begin your adventure: 
+//         https://www.google.com/maps/dir/?api=1&origin=${trip.originLat},${trip.originLng}&destination=${trip.destinationLat},${trip.destinationLng}</p>`
+//       });
+//     })
+//     .catch(err => {
+//       const error = new Error(err);
+//       error.httpStatusCode = 500;
+//       return next(error);
+//     });
+// }
 
 exports.postDeleteTrip = (req, res, next) => {
   const tripId = req.body.tripId;
@@ -289,10 +300,40 @@ exports.getTrip = (req, res, next) => {
   Trip.findById(tripId)
     .then(trip => {
       res.render('user/trip-detail', {
+        message: null,
         trip: trip,
         getWeatherIcon: this.getWeatherIcon,
         pageTitle: trip.name,
         path: '/user/my-trips'
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
+exports.getStartTrip = (req, res, next) => {
+  const tripId = req.params.tripId;
+  Trip.findById(tripId)
+    .then(trip => {
+      User.findById(trip.userId)
+        .then(user => {
+          const url = `https://www.google.com/maps/dir/?api=1&origin=${trip.originLat},${trip.originLng}&destination=${trip.destinationLat},${trip.destinationLng}`;
+          return transporter.sendMail({
+            to: user.email,
+            from: 'Trip-Planner<kyle.mueller.ghs@gmail.com>',
+            subject: 'Start your trip!',
+            html: `<h1>Hello ${user.name}!</h1>\n<h1>Enjoy your trip to ${trip.name}!</h1><a href="${url}">Click here for directions.</a>`
+          });
+        })
+      res.render('user/trip-detail', {
+        trip: trip,
+        getWeatherIcon: this.getWeatherIcon,
+        pageTitle: trip.name,
+        message: "Check your email for directions! Enjoy your trip.",
+        path: '/user/start'
       });
     })
     .catch(err => {

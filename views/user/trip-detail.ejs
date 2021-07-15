@@ -18,6 +18,10 @@
     <body>
         <%- include('../includes/header.ejs') %>
         <main class="centered">
+            <% if (message) { %>
+                <h1 class="user-message"><%= message %></h1>
+                <br>
+            <% } %>
             <h1 class="title"><%= trip.name %></h1>
             <br>
             <div class="zoomable" onmouseover="mOver()" onmouseout="mOut()" onmousemove="mMove(event)">

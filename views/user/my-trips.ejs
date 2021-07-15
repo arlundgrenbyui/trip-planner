@@ -43,6 +43,7 @@
                                     </h2>
                                 </div>
                                 <div class="card__actions">
+                                    <a href="/user/start/<%= trip._id %>" class="btn">Start</a>
                                     <a href="/user/edit-trip/<%= trip._id %>?edit=true" class="btn">Edit</a>
                                     <form action="/user/delete-trip" method="POST">
                                         <input type="hidden" value="<%= trip._id %>" name="tripId">

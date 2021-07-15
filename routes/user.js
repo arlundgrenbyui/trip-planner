@@ -14,6 +14,8 @@ router.get('/my-trips', isAuth, userController.getTrips);
 
 router.get('/my-trips/:tripId', userController.getTrip);
 
+router.get('/start/:tripId', userController.getStartTrip);
+
 router.post(
   '/add-trip',
   [
