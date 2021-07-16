@@ -224,9 +224,10 @@ exports.getTrips = (req, res, next) => {
     .then(trips => {
       const time = new Date().getTime();
       for (let trip of trips) {
-        if (trip.weather.current == undefined || (time - (trip.weather.current.dt * 1000) > 86400)) {
+        if (Object.keys(trip.weather).length === 0 || (time - (trip.weather.current.dt * 1000) > 86400000)) {
           this.getWeatherData(trip.destinationLat, trip.destinationLng)
             .then(weather => {
+              console.log("Updated weather for trip " + trip._id + " at " + new Date())
               trip.weather = weather;
               trip.save();
             });
@@ -323,7 +324,7 @@ exports.getStartTrip = (req, res, next) => {
           const url = `https://www.google.com/maps/dir/?api=1&origin=${trip.originLat},${trip.originLng}&destination=${trip.destinationLat},${trip.destinationLng}`;
           return transporter.sendMail({
             to: user.email,
-            from: 'Trip-Planner<kyle.mueller.ghs@gmail.com>',
+            from: 'Trip Planner<kyle.mueller.ghs@gmail.com>',
             subject: 'Start your trip!',
             html: `<h1>Hello ${user.name}!</h1>\n<h1>Enjoy your trip to ${trip.name}!</h1><a href="${url}">Click here for directions.</a>`
           });

@@ -87,7 +87,7 @@
             </div>
             <div class="form-control">
                 <label for="plannedDate">Date</label>
-                <input type="date" id="plannedDate" name="plannedDate" style="font-size:15px;">
+                <input type="date" id="plannedDate" name="plannedDate" style="font-size:15px;" value=<% if (editing || hasError) { %><%= trip.plannedDate.toISOString().slice(0,10) %><% } %>>
             </div>
             <div class="form-control">
                 <label for="levelOfIntensity">Level of Intensity</label>
@@ -96,6 +96,9 @@
                     <option value="Medium">Medium</option>
                     <option value="High">High</option>
                 </select>
+                <% if (editing || hasError) { %>
+                    <script>document.getElementById("levelOfIntensity").value = "<%= trip.levelOfIntensity %>"</script>
+                <% } %>
             </div>
             <div class="form-control">
                 <label for="description">Description</label>

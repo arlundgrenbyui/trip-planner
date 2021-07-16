@@ -15,8 +15,8 @@ function menuToggleClickHandler() {
 function initMap() {
   const map = new google.maps.Map(document.getElementById("map"), {
     mapTypeControl: false,
-    center: { lat: -33.8688, lng: 151.2195 },
-    zoom: 13,
+    center: { lat: 39.8097343, lng: -98.5556199 },
+    zoom: 4,
   });
   new AutocompleteDirectionsHandler(map);
 }

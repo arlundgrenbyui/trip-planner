@@ -58,9 +58,10 @@ exports.getIndex = (req, res, next) => {
     .then(trips => {
       const time = new Date().getTime();
       for (let trip of trips) {
-        if (trip.weather.current == undefined || (time - (trip.weather.current.dt * 1000) > 86400)) {
+        if (Object.keys(trip.weather).length === 0 || (time - (trip.weather.current.dt * 1000) > 86400000)) {
           this.getWeatherData(trip.destinationLat, trip.destinationLng)
             .then(weather => {
+              console.log("Updated weather for trip " + trip._id + " at " + new Date())
               trip.weather = weather;
               trip.save();
             });
