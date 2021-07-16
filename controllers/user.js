@@ -90,7 +90,7 @@ exports.postAddTrip = (req, res, next) => {
     .then(result => {
       // console.log(result);
       console.log('Created Trip');
-      res.redirect('/user/trips');
+      res.redirect('/user/my-trips');
     })
     // .then(
     //   Trip.find({ userId: req.user._id })
@@ -208,7 +208,7 @@ exports.postEditTrip = (req, res, next) => {
         trip.imageUrl = imageUrl;
         return trip.save().then(result => {
           console.log('UPDATED TRIP!');
-          res.redirect('/user/trips');
+          res.redirect('/user/my-trips');
         });
       })
       .catch(err => {
