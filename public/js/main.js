@@ -58,7 +58,7 @@ class AutocompleteDirectionsHandler {
     autocomplete.bindTo("bounds", this.map);
     autocomplete.addListener("place_changed", () => {
       const place = autocomplete.getPlace();
-
+      console.log(mode);
       if (!place.place_id) {
         window.alert("Please select an option from the dropdown list.");
         return;

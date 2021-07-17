@@ -150,73 +150,73 @@ exports.postEditTrip = (req, res, next) => {
   const tripId = req.body.tripId;
   const name = req.body.name;
   const imageUrl = req.body.imageUrl;
-  const origin = req.body.origin;
-  const destination = req.body.destination;
-  const originLat = req.body.origLat;
-  const originLng = req.body.origLng;
-  const destinationLat = req.body.destLat;
-  const destinationLng = req.body.destLng;
+  // const origin = req.body.origin;
+  // const destination = req.body.destination;
+  // const originLat = req.body.origLat;
+  // const originLng = req.body.origLng;
+  // const destinationLat = req.body.destLat;
+  // const destinationLng = req.body.destLng;
   const description = req.body.description;
   const plannedDate = req.body.plannedDate;
   const levelOfIntensity = req.body.levelOfIntensity;
   const errors = validationResult(req);
 
-  this.getWeatherData(destinationLat, destinationLng).then(weatherData => {
-    if (!errors.isEmpty()) {
-      return res.status(422).render('user/edit-trip', {
-        pageTitle: 'Edit Trip',
-        path: '/user/edit-trip',
-        editing: true,
-        api_key: process.env.GOOGLE_MAPS_API_KEY,
-        hasError: true,
-        trip: {
-          name: name,
-          origin: origin,
-          destination: destination,
-          originLat: originLat,
-          originLng: originLng,
-          destinationLat: destinationLat,
-          destinationLng: destinationLng,
-          description: description,
-          plannedDate: plannedDate,
-          weather: weatherData,
-          levelOfIntensity: levelOfIntensity,
-          imageUrl: imageUrl,
-          _id: tripId
-        },
-        errorMessage: errors.array()[0].msg,
-        validationErrors: errors.array()
-      });
-    }
+  // this.getWeatherData(destinationLat, destinationLng).then(weatherData => {
+  //   if (!errors.isEmpty()) {
+  //     return res.status(422).render('user/edit-trip', {
+  //       pageTitle: 'Edit Trip',
+  //       path: '/user/edit-trip',
+  //       editing: true,
+  //       api_key: process.env.GOOGLE_MAPS_API_KEY,
+  //       hasError: true,
+  //       trip: {
+  //         name: name,
+  //         origin: origin,
+  //         destination: destination,
+  //         // originLat: originLat,
+  //         // originLng: originLng,
+  //         // destinationLat: destinationLat,
+  //         // destinationLng: destinationLng,
+  //         description: description,
+  //         plannedDate: plannedDate,
+  //         weather: weatherData,
+  //         levelOfIntensity: levelOfIntensity,
+  //         imageUrl: imageUrl,
+  //         _id: tripId
+  //       },
+  //       errorMessage: errors.array()[0].msg,
+  //       validationErrors: errors.array()
+  //     });
+  //   }
 
-    Trip.findById(tripId)
-      .then(trip => {
-        if (trip.userId.toString() !== req.user._id.toString()) {
-          return res.redirect('/');
-        }
-        trip.name = name;
-        trip.origin = origin;
-        trip.destination = destination;
-        // trip.originLat = originLat;
-        // trip.originLng = originLng;
-        // trip.destinationLat = destinationLat;
-        // trip.destinationLng = destinationLng;
-        trip.description = description;
-        trip.plannedDate = plannedDate;
-        trip.weather = weatherData;
-        trip.levelOfIntensity = levelOfIntensity;
-        trip.imageUrl = imageUrl;
-        return trip.save().then(result => {
-          console.log('UPDATED TRIP!');
-          res.redirect('/user/my-trips');
-        });
-      })
-      .catch(err => {
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+  Trip.findById(tripId)
+    .then(trip => {
+      if (trip.userId.toString() !== req.user._id.toString()) {
+        return res.redirect('/');
+      }
+      trip.name = name;
+      // trip.origin = origin;
+      // trip.destination = destination;
+      // trip.originLat = originLat;
+      // trip.originLng = originLng;
+      // trip.destinationLat = destinationLat;
+      // trip.destinationLng = destinationLng;
+      trip.description = description;
+      trip.plannedDate = plannedDate;
+      // trip.weather = weatherData;
+      trip.levelOfIntensity = levelOfIntensity;
+      trip.imageUrl = imageUrl;
+      return trip.save().then(result => {
+        console.log('UPDATED TRIP!');
+        res.redirect('/user/my-trips');
       });
-  });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+  // });
 };
 
 exports.getTrips = (req, res, next) => {
